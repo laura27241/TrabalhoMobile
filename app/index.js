@@ -6,7 +6,7 @@ export default function Index() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("screens/LoginScreen");
+    router.replace("/LoginScreen");
   }, []);
 
   return null; 
