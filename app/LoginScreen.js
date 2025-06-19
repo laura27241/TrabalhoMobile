@@ -20,7 +20,7 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+      <TouchableOpacity onPress={() => router.push("/RegisterScreen")}>
         <Text style={styles.link}>Não tem conta? Cadastrar</Text>
       </TouchableOpacity>
     </View>

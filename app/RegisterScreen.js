@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function RegisterScreen({ navigation }) {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>TaskEasy</Text>
@@ -12,11 +13,11 @@ export default function RegisterScreen({ navigation }) {
       <TextInput placeholder="Senha" secureTextEntry style={styles.input} />
       <TextInput placeholder="Confirmar senha" secureTextEntry style={styles.input} />
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/LoginScreen')}>
         <Text style={styles.buttonText}>Cadastrar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity onPress={() => router.push('/LoginScreen')}>
         <Text style={styles.link}>Já possui uma conta? Entre!</Text>
       </TouchableOpacity>
     </View>
