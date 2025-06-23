@@ -1,50 +1,85 @@
-# Welcome to your Expo app 👋
+# TaskEasy
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+TaskEasy é um aplicativo de gerenciamento de tarefas desenvolvido em **React Native com Expo**, como projeto final da disciplina de **Soluções Mobile** do curso de Engenharia de Software - UNISATC.
 
-## Get started
+## 📱 Funcionalidades
 
-1. Install dependencies
+- Cadastro de novas tarefas
+- Listagem de tarefas
+- Visualização dos detalhes da tarefa
+- Edição de tarefas
+- Exclusão de tarefas
+- Persistência dos dados local no dispositivo
 
-   ```bash
-   npm install
-   ```
+## 🎯 Requisitos Atendidos
 
-2. Start the app
+- ✅ Mínimo 4 telas
+- ✅ Nome e ícone personalizados
+- ✅ Persistência de dados local
+- ✅ CRUD completo (Cadastro, Edição, Listagem e Exclusão)
+- ✅ 100% desenvolvido em React Native com Expo
 
-   ```bash
-   npx expo start
-   ```
+## 🚀 Tecnologias
 
-In the output, you'll find options to open the app in a
+- React Native
+- Expo
+- AsyncStorage (para persistência local)
+- JavaScript
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🔧 Como Executar
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+1. Clone o repositório:
+git clone [URL_DO_SEU_REPOSITORIO]
 
-## Get a fresh project
+arduino
+Copiar
+Editar
 
-When you're ready, run:
+2. Acesse a pasta do projeto:
+cd TrabalhoMobile-main
 
-```bash
-npm run reset-project
-```
+csharp
+Copiar
+Editar
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+3. Instale as dependências:
+npm install
 
-## Learn more
+markdown
+Copiar
+Editar
 
-To learn more about developing your project with Expo, look at the following resources:
+4. Execute o projeto:
+npx expo start
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+markdown
+Copiar
+Editar
 
-## Join the community
+Abra o app no seu celular usando o **Expo Go** (Android ou iOS) escaneando o QR Code.
 
-Join our community of developers creating universal apps.
+## 🗂️ Estrutura de Telas
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `LoginScreen.js` - Tela de login
+- `RegisterScreen.js` - Tela de cadastro de usuário
+- `TaskListScreen.js` - Tela principal com lista de tarefas
+- `TaskDetailScreen.js` - Tela de detalhes, edição e remoção de tarefa
+- `AddTaskScreen.js` - Tela para adicionar nova tarefa
+
+## 🖼️ Imagens e Ícones
+
+O aplicativo possui ícone personalizado localizado em:
+/assets/images/icon.png
+
+yaml
+Copiar
+Editar
+
+## 📄 Autoria
+
+- Desenvolvido por: Amanda Dimas, Maria Laura Da Rosa Laurindo, Gabrielle Coelho
+- Projeto acadêmico - UNISATC
+
+---
+
+> Projeto criado para fins acadêmicos na disciplina de Soluções Mobile.

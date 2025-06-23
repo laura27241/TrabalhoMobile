@@ -1,17 +1,70 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTasks } from '../context/TasksContext';
+import * as Notifications from 'expo-notifications';
+import { format, parseISO } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 
 export default function TaskListScreen() {
   const router = useRouter();
-  const { tasks } = useTasks();
+  const { tasks, toggleComplete } = useTasks();
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    const getPermission = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissão necessária', 'Ative as notificações para receber lembretes de tarefas.');
+      }
+    };
+
+    getPermission();
+  }, []);
+
+  const scheduleNotification = async (task) => {
+    try {
+      const taskDate = parseISO(task.schedule);
+      const notificationTime = new Date(taskDate.getTime() - 5 * 60 * 1000);
+
+      if (notificationTime <= new Date()) {
+        console.log('Horário da notificação já passou.');
+        return;
+      }
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Lembrete de Tarefa 📌',
+          body: `Sua tarefa "${task.title}" começa em 5 minutos.`,
+          sound: true,
+        },
+        trigger: { type: 'date', date: notificationTime },
+      });
+
+      console.log('Notificação agendada para:', notificationTime);
+    } catch (error) {
+      console.error('Erro ao agendar notificação:', error);
+    }
+  };
 
   const filteredTasks = tasks.filter(task =>
     task.title.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleComplete = (id) => {
+    toggleComplete(id);
+    Alert.alert('Tarefa concluída', 'A tarefa foi marcada como concluída!');
+  };
+
+  const formatSchedule = (isoString) => {
+    try {
+      const date = parseISO(isoString);
+      return format(date, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+    } catch {
+      return isoString;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -34,18 +87,28 @@ export default function TaskListScreen() {
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.task}
-            onPress={() =>
+            style={[
+              styles.task,
+              item.completed && { backgroundColor: '#d2ffd2' }
+            ]}
+            onPress={async () => {
+              await scheduleNotification(item);
               router.push({
                 pathname: '/TaskDetailScreen',
-                params: { id: item.id, title: item.title, schedule: item.schedule, icon: item.icon },
-              })
-            }
+                params: {
+                  id: item.id,
+                  title: item.title,
+                  schedule: item.schedule,
+                  icon: item.icon,
+                },
+              });
+            }}
+            onLongPress={() => handleComplete(item.id)}
           >
             <MaterialIcons name={item.icon} size={28} color="#507daf" style={{ marginRight: 10 }} />
             <View>
               <Text style={{ fontWeight: 'bold' }}>{item.title}</Text>
-              <Text>{item.schedule}</Text>
+              <Text>{formatSchedule(item.schedule)}</Text>
             </View>
           </TouchableOpacity>
         )}

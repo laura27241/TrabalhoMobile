@@ -1,22 +1,22 @@
 {
   "expo": {
     "name": "TaskEasy",
-    "slug": "TaskEasy",
+    "slug": "taskeasy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "taskeasy",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.amandadimasp.taskeasy"
+    },
+    "ios": {
+      "supportsTablet": true
     },
     "web": {
       "bundler": "metro",
@@ -34,10 +34,17 @@
         }
       ],
       "expo-router",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "fceb723a-6a93-4eaa-8620-14e1e957a42f"
+      }
     }
   }
 }

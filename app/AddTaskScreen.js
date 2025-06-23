@@ -1,8 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTasks } from '../context/TasksContext';
+import * as Notifications from 'expo-notifications';
+import { parse } from 'date-fns';
 
 export default function AddTaskScreen() {
   const router = useRouter();
@@ -10,11 +12,56 @@ export default function AddTaskScreen() {
   const [title, setTitle] = useState('');
   const [schedule, setSchedule] = useState('');
 
-  const handleAddTask = () => {
+  useEffect(() => {
+    const getPermission = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissão necessária', 'Ative as notificações para receber lembretes de tarefas.');
+      }
+    };
+
+    getPermission();
+  }, []);
+
+  const scheduleNotification = async (taskTitle, scheduleText) => {
+    try {
+      // Faz o parse do texto digitado pelo usuário (ex: "22/06/2025 21:35")
+      const parsedDate = parse(scheduleText, 'dd/MM/yyyy HH:mm', new Date());
+
+      if (isNaN(parsedDate.getTime())) {
+        Alert.alert('Formato inválido', 'Por favor, use o formato: dd/MM/yyyy HH:mm. Exemplo: 22/06/2025 21:35');
+        return;
+      }
+
+      const notificationTime = new Date(parsedDate.getTime() - 5 * 60 * 1000);
+
+      if (notificationTime <= new Date()) {
+        console.log('Horário da notificação já passou. Não será agendada.');
+        return;
+      }
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Lembrete de Tarefa 📌',
+          body: `Sua tarefa "${taskTitle}" começa em 5 minutos.`,
+          sound: true,
+        },
+        trigger: { type: 'date', date: notificationTime },
+      });
+
+      console.log('Notificação agendada para:', notificationTime);
+    } catch (error) {
+      console.error('Erro ao agendar notificação:', error);
+    }
+  };
+
+  const handleAddTask = async () => {
     if (title.trim() === '' || schedule.trim() === '') {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
+
+    await scheduleNotification(title, schedule);
     addTask(title, schedule);
     router.back();
   };
@@ -31,9 +78,9 @@ export default function AddTaskScreen() {
         onChangeText={setTitle}
       />
 
-      <Text style={styles.label}>Horário/Agenda:</Text>
+      <Text style={styles.label}> Dia/Horário:</Text>
       <TextInput
-        placeholder="Ex: Quinta-feira às 21:30"
+        placeholder="Ex: 22/06/2025 21:35"
         style={styles.input}
         value={schedule}
         onChangeText={setSchedule}
