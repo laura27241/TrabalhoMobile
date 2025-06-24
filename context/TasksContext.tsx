@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { AndroidImportance } from 'expo-notifications';
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Alert, Platform } from 'react-native';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
 type Task = {
   id: string;
@@ -16,6 +16,7 @@ type TasksContextType = {
   tasks: Task[];
   addTask: (title: string, schedule: string) => void;
   toggleComplete: (id: string) => void;
+  deleteTask: (id: string) => void;
 };
 
 const TasksContext = createContext<TasksContextType | undefined>(undefined);
@@ -129,8 +130,12 @@ export const TasksProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const deleteTask = (id: string) => {
+    setTasks(prev => prev.filter(task => task.id !== id));
+  };
+
   return (
-    <TasksContext.Provider value={{ tasks, addTask, toggleComplete }}>
+    <TasksContext.Provider value={{ tasks, addTask, toggleComplete, deleteTask }}>
       {children}
     </TasksContext.Provider>
   );

@@ -1,15 +1,15 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { format, isBefore, parseISO } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
+import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTasks } from '../context/TasksContext';
-import * as Notifications from 'expo-notifications';
-import { format, parseISO, isBefore } from 'date-fns';
-import ptBR from 'date-fns/locale/pt-BR';
 
 export default function TaskListScreen() {
   const router = useRouter();
-  const { tasks, toggleComplete } = useTasks();
+  const { tasks, toggleComplete, deleteTask } = useTasks();
   const [search, setSearch] = useState('');
   const [mascotState, setMascotState] = useState('🥀');
 
@@ -34,19 +34,19 @@ export default function TaskListScreen() {
     const hasOverdueTasks = tasks.some(t => !t.completed && isBefore(parseISO(t.schedule), now));
 
     if (completedCount === 0) {
-      setMascotState('🥀'); // Triste
+      setMascotState('🥀');
     } else if (completedCount === 1) {
-      setMascotState('🌱'); // Broto reagindo
+      setMascotState('🌱');
     } else if (completedCount === 2) {
-      setMascotState('🌿'); // Pequena mas melhorando
+      setMascotState('🌿');
     } else if (completedCount >= 3 && completedCount < 5) {
-      setMascotState('🌳'); // Árvore
+      setMascotState('🌳');
     } else if (completedCount >= 5) {
-      setMascotState('🌸'); // Florindo de felicidade
+      setMascotState('🌸');
     }
 
     if (hasOverdueTasks) {
-      setMascotState('🥀'); // Tarefas atrasadas deixam a planta triste novamente
+      setMascotState('🥀');
     }
   };
 
@@ -84,6 +84,17 @@ export default function TaskListScreen() {
     Alert.alert('Tarefa concluída ✅', 'Sua planta ficou um pouco mais feliz! 🌱');
   };
 
+  const handleDelete = (id) => {
+    Alert.alert(
+      'Deletar tarefa',
+      'Tem certeza que deseja deletar esta tarefa?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Deletar', style: 'destructive', onPress: () => deleteTask(id) },
+      ]
+    );
+  };
+
   const formatSchedule = (isoString) => {
     try {
       const date = parseISO(isoString);
@@ -95,7 +106,6 @@ export default function TaskListScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Mascote */}
       <View style={styles.mascotContainer}>
         <Text style={styles.mascot}>{mascotState}</Text>
         <Text style={styles.mascotText}>
@@ -141,10 +151,13 @@ export default function TaskListScreen() {
             onLongPress={() => handleComplete(item.id)}
           >
             <MaterialIcons name={item.icon} size={28} color="#507daf" style={{ marginRight: 10 }} />
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={{ fontWeight: 'bold' }}>{item.title}</Text>
               <Text>{formatSchedule(item.schedule)}</Text>
             </View>
+            <TouchableOpacity onPress={() => handleDelete(item.id)}>
+              <MaterialIcons name="delete" size={24} color="red" />
+            </TouchableOpacity>
           </TouchableOpacity>
         )}
       />
