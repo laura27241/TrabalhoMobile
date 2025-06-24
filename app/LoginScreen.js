@@ -1,28 +1,68 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-export default function LoginScreen({ navigation }) {
-  console.log("navigation", navigation);
+export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [erro, setErro] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const savedEmail = await AsyncStorage.getItem('userEmail');
+      if (savedEmail) {
+        router.push('/TaskListScreen');
+      }
+    };
+    checkLogin();
+  }, []);
+
+  const fazerLogin = async () => {
+    if (!email || !senha) {
+      setErro('Preencha email e senha');
+      return;
+    }
+
+    try {
+      const userData = await AsyncStorage.getItem('userData');
+      if (!userData) {
+        setErro('Usuário não cadastrado');
+        return;
+      }
+
+      const { email: savedEmail, senha: savedSenha } = JSON.parse(userData);
+
+      if (email === savedEmail && senha === savedSenha) {
+        await AsyncStorage.setItem('userEmail', email); // salva login ativo
+        router.push('/TaskListScreen');
+      } else {
+        setErro('Email ou senha incorretos');
+      }
+    } catch (e) {
+      setErro('Erro ao fazer login');
+      console.error(e);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>TaskEasy</Text>
       <Text style={styles.subtitle}>Login</Text>
 
-      <TextInput placeholder="Email ou usuário" style={styles.input} onChangeText={setEmail} />
-      <TextInput placeholder="Senha" secureTextEntry style={styles.input} onChangeText={setSenha} />
+      <TextInput placeholder="Email ou usuário" style={styles.input} onChangeText={setEmail} value={email} />
+      <TextInput placeholder="Senha" secureTextEntry style={styles.input} onChangeText={setSenha} value={senha} />
 
-      <TouchableOpacity style={styles.button} onPress={() => router.push("/TaskListScreen")}>
+      <TouchableOpacity style={styles.button} onPress={fazerLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push("/RegisterScreen")}>
         <Text style={styles.link}>Não tem conta? Cadastrar</Text>
       </TouchableOpacity>
+
+      {erro ? <Text style={{ color: 'red' }}>{erro}</Text> : null}
     </View>
   );
 }

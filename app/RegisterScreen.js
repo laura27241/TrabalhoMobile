@@ -1,25 +1,54 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function RegisterScreen({ navigation }) {
   const router = useRouter();
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [erro, setErro] = useState('');
+  const criarConta = async () => {
+  if (!nome || !email || !senha || !confirmarSenha) {
+    setErro('Preencha todos os campos');
+    return;
+  }
+
+  if (senha !== confirmarSenha) {
+    setErro('As senhas não coincidem');
+    return;
+  }
+  try {
+    const user = { nome, email, senha };
+    await AsyncStorage.setItem('userData', JSON.stringify(user));
+    await AsyncStorage.setItem('userEmail', email); 
+    router.push('/LoginScreen');
+  } catch (e) {
+    setErro('Erro ao criar conta');
+    console.error(e);
+  }
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>TaskEasy</Text>
       <Text style={styles.subtitle}>Cadastro</Text>
 
-      <TextInput placeholder="Nome Completo" style={styles.input} />
-      <TextInput placeholder="Email" style={styles.input} />
-      <TextInput placeholder="Senha" secureTextEntry style={styles.input} />
-      <TextInput placeholder="Confirmar senha" secureTextEntry style={styles.input} />
+      <TextInput placeholder="Nome Completo" style={styles.input} onChangeText={setNome} value={nome} />
+      <TextInput placeholder="Email" style={styles.input} onChangeText={setEmail} value={email} />
+      <TextInput placeholder="Senha" secureTextEntry style={styles.input} onChangeText={setSenha} value={senha} />
+      <TextInput placeholder="Confirmar senha" secureTextEntry style={styles.input} onChangeText={setConfirmarSenha} value={confirmarSenha} />
 
-      <TouchableOpacity style={styles.button} onPress={() => router.push('/LoginScreen')}>
+      <TouchableOpacity style={styles.button} onPress={criarConta}>
         <Text style={styles.buttonText}>Cadastrar</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push('/LoginScreen')}>
         <Text style={styles.link}>Já possui uma conta? Entre!</Text>
       </TouchableOpacity>
+
+      {erro ? <Text style={{ color: 'red' }}>{erro}</Text> : null}
     </View>
   );
 }

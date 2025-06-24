@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTasks } from '../context/TasksContext';
 import * as Notifications from 'expo-notifications';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isBefore } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 export default function TaskListScreen() {
   const router = useRouter();
   const { tasks, toggleComplete } = useTasks();
   const [search, setSearch] = useState('');
+  const [mascotState, setMascotState] = useState('🥀');
 
   useEffect(() => {
     const getPermission = async () => {
@@ -22,6 +23,32 @@ export default function TaskListScreen() {
 
     getPermission();
   }, []);
+
+  useEffect(() => {
+    updateMascotState();
+  }, [tasks]);
+
+  const updateMascotState = () => {
+    const completedCount = tasks.filter(t => t.completed).length;
+    const now = new Date();
+    const hasOverdueTasks = tasks.some(t => !t.completed && isBefore(parseISO(t.schedule), now));
+
+    if (completedCount === 0) {
+      setMascotState('🥀'); // Triste
+    } else if (completedCount === 1) {
+      setMascotState('🌱'); // Broto reagindo
+    } else if (completedCount === 2) {
+      setMascotState('🌿'); // Pequena mas melhorando
+    } else if (completedCount >= 3 && completedCount < 5) {
+      setMascotState('🌳'); // Árvore
+    } else if (completedCount >= 5) {
+      setMascotState('🌸'); // Florindo de felicidade
+    }
+
+    if (hasOverdueTasks) {
+      setMascotState('🥀'); // Tarefas atrasadas deixam a planta triste novamente
+    }
+  };
 
   const scheduleNotification = async (task) => {
     try {
@@ -54,7 +81,7 @@ export default function TaskListScreen() {
 
   const handleComplete = (id) => {
     toggleComplete(id);
-    Alert.alert('Tarefa concluída', 'A tarefa foi marcada como concluída!');
+    Alert.alert('Tarefa concluída ✅', 'Sua planta ficou um pouco mais feliz! 🌱');
   };
 
   const formatSchedule = (isoString) => {
@@ -68,6 +95,14 @@ export default function TaskListScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Mascote */}
+      <View style={styles.mascotContainer}>
+        <Text style={styles.mascot}>{mascotState}</Text>
+        <Text style={styles.mascotText}>
+          {mascotState === '🥀' ? 'Sua planta está triste...' : 'Sua planta está crescendo! 🌱'}
+        </Text>
+      </View>
+
       <Text style={styles.title}>TaskEasy</Text>
       <Text style={styles.subtitle}>Tarefas:</Text>
 
@@ -123,6 +158,9 @@ export default function TaskListScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 60, paddingHorizontal: 20, backgroundColor: '#eaf4ff', paddingBottom: 30 },
+  mascotContainer: { alignItems: 'center', marginBottom: 20 },
+  mascot: { fontSize: 48 },
+  mascotText: { fontSize: 16, color: '#333', marginTop: 5, textAlign: 'center' },
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 10, marginBottom: 10 },
   searchIcon: { margin: 8 },
   title: { fontSize: 32, fontWeight: 'bold', color: '#77a3d0', textAlign: 'center' },
